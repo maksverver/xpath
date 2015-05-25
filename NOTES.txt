@@ -1,0 +1,13 @@
+XPath 1.0 reference: http://www.w3.org/TR/xpath/
+
+TBD:
+  - which axes are supported? (differences with XPath spec?)
+    (note: fields in protos are not completely ordered; should I order them
+           according to definition order in proto?)
+  - which node types?
+  - which built-in functions? (differences with XPath spec?)
+  - can I match text-only protos without a definition? (This changes the
+    definition of document-order. Requires text parsing.)
+
+TODO:
+  - create testcases for examples listed
