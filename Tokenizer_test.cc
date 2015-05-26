@@ -42,7 +42,7 @@ TEST(TokenizerTest, ParseTokens) {
 	TestScanBasicToken("..", T_DoubleDot);
 	TestScanBasicToken("@", T_At);
 	TestScanBasicToken(",", T_Comma);
-	TestScanBasicToken(":", T_NameTest);
+	TestScanBasicToken(":", T_None);
 	TestScanBasicToken("::", T_DoubleColon);
 	TestScanBasicToken("'x'", T_Literal);
 	TestScanBasicToken("'foo'", T_Literal);

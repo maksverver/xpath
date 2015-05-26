@@ -14,7 +14,8 @@ namespace {
 
 bool IsIdentifierStartChar(char c) {
   // TODO: support Unicode chars too. Requires UTF-8 decoding?
-  return c == ':' || c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+  // Note: unlike XPath we don't support ':' in identifiers.
+  return c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 }
 
 bool IsIdentifierChar(char c) {
