@@ -4,6 +4,7 @@
 #include "Tokenizer.h"
 
 #include <ctype.h>
+#include <string.h>
 
 #define RETURN_TOKEN(Size, Type) do { *token_size = Size; return Type; } while(0)
 #define RETURN_ERROR() RETURN_TOKEN(1, T_None)
@@ -35,8 +36,43 @@ size_t ScanIdentifier(const char* data, size_t size) {
 
 }  // namespace
 
-// Scans a token in a context-free manner. Identifiers are returned as T_NameTest.
-// Asterisks are returned as T_Multiply. These tokens may need to be reinterpreted.
+template<int N> bool Equals(const char (&buf)[N], const char* data, size_t size) {
+  return N > 0 && size == N - 1 && memcmp(data, &buf[0], N - 1) == 0;
+}
+
+NodeType ParseNodeType(const char* data, size_t size) {
+  if (Equals("comment", data, size)) return N_Comment;
+  if (Equals("text", data, size)) return N_Text;
+  if (Equals("processing-instruction", data, size)) return N_ProcessingInstruction;
+  if (Equals("node", data, size)) return N_Node;
+  return N_None;
+}
+
+OperatorName ParseOperatorName(const char* data, size_t size) {
+  if (Equals("and", data, size)) return O_And;
+  if (Equals("or", data, size)) return O_Or;
+  if (Equals("mod", data, size)) return O_Mod;
+  if (Equals("div", data, size)) return O_Div;
+  return O_None;
+}
+
+AxisName ParseAxisName(const char* data, size_t size) {
+  if (Equals("ancestor", data, size)) return A_Ancestor;
+  if (Equals("ancestor-or-self", data, size)) return A_AncestorOrSelf;
+  if (Equals("attribute", data, size)) return A_Attribute;
+  if (Equals("child", data, size)) return A_Child;
+  if (Equals("descendant", data, size)) return A_Descendant;
+  if (Equals("descendant-or-self", data, size)) return A_DescendantOrSelf;
+  if (Equals("following", data, size)) return A_Following;
+  if (Equals("following-sibling", data, size)) return A_FollowingSibling;
+  if (Equals("namespace", data, size)) return A_Namespace;
+  if (Equals("parent", data, size)) return A_Parent;
+  if (Equals("preceding", data, size)) return A_Preceding;
+  if (Equals("preceding-sibling", data, size)) return A_PrecedingSibling;
+  if (Equals("self", data, size)) return A_Self;
+  return A_None;
+}
+
 TokenType ScanToken(const char* data, size_t size,
                     const char** token_data, size_t* token_size) {
   // Skip leading whitespace                       

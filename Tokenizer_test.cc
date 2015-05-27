@@ -167,9 +167,76 @@ TEST(DisambiguateToken, AxisName) {
   EXPECT_EQ(T_AxisName, DisambiguateToken(T_None, T_NameTest, T_DoubleColon));
 }
 
+NodeType ParseNodeType(const string& s) {
+  return xpath::ParseNodeType(s.data(), s.size());
+}
+
+TEST(ParseNodeType, ValidNodeTypes) {
+  EXPECT_EQ(N_Comment, ParseNodeType("comment"));
+  EXPECT_EQ(N_Text, ParseNodeType("text"));
+  EXPECT_EQ(N_ProcessingInstruction, ParseNodeType("processing-instruction"));
+  EXPECT_EQ(N_Node, ParseNodeType("node"));
+}
+
+TEST(ParseNodeType, InvalidNodeTypes) {
+  EXPECT_EQ(N_None, ParseNodeType(""));
+  EXPECT_EQ(N_None, ParseNodeType("NODE"));
+  EXPECT_EQ(N_None, ParseNodeType("nod"));
+  EXPECT_EQ(N_None, ParseNodeType("nodex"));
+  EXPECT_EQ(N_None, ParseNodeType("processing_instruction"));
+  EXPECT_EQ(N_None, ParseNodeType("and"));
+}
+
+OperatorName ParseOperatorName(const string& s) {
+  return xpath::ParseOperatorName(s.data(), s.size());
+}
+
+TEST(ParseOperatorName, ValidOperatorNames) {
+  EXPECT_EQ(O_And, ParseOperatorName("and"));
+  EXPECT_EQ(O_Or, ParseOperatorName("or"));
+  EXPECT_EQ(O_Mod, ParseOperatorName("mod"));
+  EXPECT_EQ(O_Div, ParseOperatorName("div"));
+}
+
+TEST(ParseOperatorName, InvalidOperatorNames) {
+  EXPECT_EQ(O_None, ParseOperatorName(""));
+  EXPECT_EQ(O_None, ParseOperatorName("AND"));
+  EXPECT_EQ(O_None, ParseOperatorName("an"));
+  EXPECT_EQ(O_None, ParseOperatorName("andy"));
+  EXPECT_EQ(O_None, ParseOperatorName("node"));
+}
+
+AxisName ParseAxisName(const string& s) {
+  return xpath::ParseAxisName(s.data(), s.size());
+}
+
+TEST(ParseAxisName, ValidAxisNames) {
+  EXPECT_EQ(A_Ancestor, ParseAxisName("ancestor"));
+  EXPECT_EQ(A_AncestorOrSelf, ParseAxisName("ancestor-or-self"));
+  EXPECT_EQ(A_Attribute, ParseAxisName("attribute"));
+  EXPECT_EQ(A_Child, ParseAxisName("child"));
+  EXPECT_EQ(A_Descendant, ParseAxisName("descendant"));
+  EXPECT_EQ(A_DescendantOrSelf, ParseAxisName("descendant-or-self"));
+  EXPECT_EQ(A_Following, ParseAxisName("following"));
+  EXPECT_EQ(A_FollowingSibling, ParseAxisName("following-sibling"));
+  EXPECT_EQ(A_Namespace, ParseAxisName("namespace"));
+  EXPECT_EQ(A_Parent, ParseAxisName("parent"));
+  EXPECT_EQ(A_Preceding, ParseAxisName("preceding"));
+  EXPECT_EQ(A_PrecedingSibling, ParseAxisName("preceding-sibling"));
+  EXPECT_EQ(A_Self, ParseAxisName("self"));
+}
+
+TEST(ParseAxisName, InvalidAxisNames) {
+  EXPECT_EQ(A_None, ParseAxisName(""));
+  EXPECT_EQ(A_None, ParseAxisName("ancestor-"));
+  EXPECT_EQ(A_None, ParseAxisName("ancestor_or_self"));
+  EXPECT_EQ(A_None, ParseAxisName("and"));
+  EXPECT_EQ(A_None, ParseAxisName("node"));
+}
+
 // TODO: unit tests for Tokenize()
 //        include test that distinguishes between FunctionName and NodeType
 //        include test that errors out on valid token which is not a valid Operator name
 
-}  // namespace xpath
 }  // namespace
+}  // namespace xpath

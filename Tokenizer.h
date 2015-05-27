@@ -50,7 +50,7 @@ enum TokenType {
   T_AxisName,
   T_NameTest };
 
-enum NodeTypes {
+enum NodeType {
   N_None = 0,
 
   N_Comment,
@@ -58,7 +58,7 @@ enum NodeTypes {
   N_ProcessingInstruction,
   N_Node };
 
-enum OperatorNames {
+enum OperatorName {
   O_None = 0,
 
   O_And,
@@ -66,7 +66,7 @@ enum OperatorNames {
   O_Mod,
   O_Div };
 
-enum AxisTypes {
+enum AxisName {
   A_None = 0,
 
   A_Ancestor,
@@ -82,6 +82,19 @@ enum AxisTypes {
   A_Preceding,
   A_PrecedingSibling,
   A_Self };
+
+// Converts the string described by `data` and `size` to a NodeType or returns
+// N_None if it does not match any node type. Matching is case sensitive.
+NodeType ParseNodeType(const char* data, size_t size);
+
+// Converts the string described by `data` and `size` to an OperatorName or
+// returns O_None if it does not match any operator name. Matching is case
+// sensitive.
+OperatorName ParseOperatorName(const char* data, size_t size);
+
+// Converts the string described by `data` and `size` to an AxisType or returns
+// A_None if it does not match any axis type. Matching is case sensitive.
+AxisName ParseAxisName(const char* data, size_t size);
 
 // Scans the next token (skipping whitespace, if any) from the string described
 // by `data` and `size`.
@@ -102,7 +115,6 @@ enum AxisTypes {
 // all identifiers are returned as T_NameTest, and an asterisk is returned as
 // T_Multiply. Use DisambiguateToken() or DisambiguateTokens() below to perform
 // context-sensitive disambiguation of tokens.
-//
 TokenType ScanToken(const char* data, size_t size,
                     const char** token_data, size_t* token_size);
 
