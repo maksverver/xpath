@@ -21,14 +21,13 @@ void TestEndOfInput(const string& input) {
 
 }
     
-TEST(TokenizerTest, EmptyInput) {
+TEST(ScanToken, EmptyInput) {
   TestEndOfInput("");
   TestEndOfInput(" ");
   TestEndOfInput("   \r\n\t ");
 }
 
-
-void TestScanBasicToken(const string& input, TokenType expected) {
+void TestScanToken(const string& input, TokenType expected) {
   const char *token_data = nullptr;
   size_t token_size = 1234567;
   TokenType received = ScanToken(input.data(), input.size(), &token_data, &token_size);
@@ -37,51 +36,51 @@ void TestScanBasicToken(const string& input, TokenType expected) {
   if (expected != T_None) EXPECT_EQ(input.size(), token_size) << input;
 }
 
-TEST(TokenizerTest, ParseTokens) {
-	TestScanBasicToken("(", T_LeftParen);
-	TestScanBasicToken(")", T_RightParen);
-	TestScanBasicToken("[", T_LeftBracket);
-	TestScanBasicToken("]", T_RightBracket);
-	TestScanBasicToken(".", T_Dot);
-	TestScanBasicToken("..", T_DoubleDot);
-	TestScanBasicToken("@", T_At);
-	TestScanBasicToken(",", T_Comma);
-	TestScanBasicToken(":", T_None);
-	TestScanBasicToken("::", T_DoubleColon);
-	TestScanBasicToken("'x'", T_Literal);
-	TestScanBasicToken("'foo'", T_Literal);
-	TestScanBasicToken("'\"'", T_Literal);
-	TestScanBasicToken("\"y\"", T_Literal);
-	TestScanBasicToken("\"bar\"", T_Literal);
-	TestScanBasicToken("\"'\"", T_Literal);
-	TestScanBasicToken("7", T_Number);
-	TestScanBasicToken("123", T_Number);
-	TestScanBasicToken("4.2", T_Number);
-	TestScanBasicToken(".7", T_Number);
-	TestScanBasicToken(".123", T_Number);
-	TestScanBasicToken("/", T_Slash);
-	TestScanBasicToken("//", T_DoubleSlash);
-	TestScanBasicToken("|", T_Pipe);
-	TestScanBasicToken("+", T_Plus);
-	TestScanBasicToken("-", T_Minus);
-	TestScanBasicToken("=", T_Equal);
-	TestScanBasicToken("!", T_None);
-	TestScanBasicToken("!=", T_NotEqual);
-	TestScanBasicToken("<", T_LessThan);
-	TestScanBasicToken("<=", T_LessEqual);
-	TestScanBasicToken(">", T_GreaterThan);
-	TestScanBasicToken(">=", T_GreaterEqual);
-	TestScanBasicToken("*", T_Multiply);
-  TestScanBasicToken("$", T_None);
-  TestScanBasicToken("$foo", T_VariableReference);
-  TestScanBasicToken("or", T_NameTest);
-  TestScanBasicToken("child", T_NameTest);
-  TestScanBasicToken("f", T_NameTest);
+TEST(ScanToken, SingleToken) {
+	TestScanToken("(", T_LeftParen);
+	TestScanToken(")", T_RightParen);
+	TestScanToken("[", T_LeftBracket);
+	TestScanToken("]", T_RightBracket);
+	TestScanToken(".", T_Dot);
+	TestScanToken("..", T_DoubleDot);
+	TestScanToken("@", T_At);
+	TestScanToken(",", T_Comma);
+	TestScanToken(":", T_None);
+	TestScanToken("::", T_DoubleColon);
+	TestScanToken("'x'", T_Literal);
+	TestScanToken("'foo'", T_Literal);
+	TestScanToken("'\"'", T_Literal);
+	TestScanToken("\"y\"", T_Literal);
+	TestScanToken("\"bar\"", T_Literal);
+	TestScanToken("\"'\"", T_Literal);
+	TestScanToken("7", T_Number);
+	TestScanToken("123", T_Number);
+	TestScanToken("4.2", T_Number);
+	TestScanToken(".7", T_Number);
+	TestScanToken(".123", T_Number);
+	TestScanToken("/", T_Slash);
+	TestScanToken("//", T_DoubleSlash);
+	TestScanToken("|", T_Pipe);
+	TestScanToken("+", T_Plus);
+	TestScanToken("-", T_Minus);
+	TestScanToken("=", T_Equal);
+	TestScanToken("!", T_None);
+	TestScanToken("!=", T_NotEqual);
+	TestScanToken("<", T_LessThan);
+	TestScanToken("<=", T_LessEqual);
+	TestScanToken(">", T_GreaterThan);
+	TestScanToken(">=", T_GreaterEqual);
+	TestScanToken("*", T_Multiply);
+  TestScanToken("$", T_None);
+  TestScanToken("$foo", T_VariableReference);
+  TestScanToken("or", T_NameTest);
+  TestScanToken("child", T_NameTest);
+  TestScanToken("f", T_NameTest);
 }
 
-void TestTokenizer(
+void TestScanToken(
     const string& input,
-    const vector<pair<TokenType,string>>& expected) {
+    const vector<pair<TokenType, string>>& expected) {
   int num_tokens = 0;
   const char* input_data = input.data();
   const char* input_end = input_data + input.size();
@@ -102,7 +101,7 @@ void TestTokenizer(
 }
 
 TEST(TokenizerTest, MultipleTokens) {
-  TestTokenizer("concat('foo', 'bar', 'baz')",
+  TestScanToken("concat('foo', 'bar', 'baz')",
     {{T_NameTest, "concat"},
      {T_LeftParen, "("},
      {T_Literal, "'foo'"},
@@ -111,13 +110,13 @@ TEST(TokenizerTest, MultipleTokens) {
      {T_Comma, ","},
      {T_Literal, "'baz'"},
      {T_RightParen, ")"}});
-  TestTokenizer(" test with \t some\nwhitespace\r",
+  TestScanToken(" test with \t some\nwhitespace\r",
     {{T_NameTest, "test"},
      {T_NameTest, "with"},
      {T_NameTest, "some"},
      {T_NameTest, "whitespace"}});
-  TestTokenizer("-123", {{T_Minus, "-"}, {T_Number, "123"}});
-  TestTokenizer("/child::*[position()>=1])",
+  TestScanToken("-123", {{T_Minus, "-"}, {T_Number, "123"}});
+  TestScanToken("/child::*[position()>=1])",
      {{T_Slash, "/"},
       {T_NameTest, "child"},
       {T_DoubleColon, "::"},

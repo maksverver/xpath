@@ -2,6 +2,9 @@
 #define XPATH_TOKENIZER_INCLUDED
 
 #include <stdlib.h>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace xpath {
 
@@ -110,6 +113,13 @@ TokenType ScanToken(const char* data, size_t size,
 TokenType DisambiguateToken(TokenType previous,
                             TokenType current,
                             TokenType next);
+
+// Tokenizes  the `input` string, disambiguates tokens, and writes the result
+// to *tokens. If the whole input can be succesfully tokenized, this function
+// returns input.size(). Otherwise, it returns a value less than input.size():
+// the index where the scanning error occurred.
+size_t Tokenize(const std::string& input,
+                std::vector<std::pair<TokenType, std::string>> *tokens);
 
 }  // namespace xpath
 
