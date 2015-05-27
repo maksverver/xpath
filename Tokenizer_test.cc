@@ -131,7 +131,45 @@ TEST(TokenizerTest, MultipleTokens) {
       {T_RightParen, ")"}});
 }
 
-// TODO: unit tests for DisambiguateToken
+TEST(DisambiguateToken, Multiply) {
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_None, T_Multiply, T_None));
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_At, T_Multiply, T_None));
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_DoubleColon, T_Multiply, T_None));
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_LeftParen, T_Multiply, T_None));
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_LeftBracket, T_Multiply, T_None));
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_Comma, T_Multiply, T_None));
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_Slash, T_Multiply, T_None));
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_Multiply, T_Multiply, T_None));
+  EXPECT_EQ(T_Multiply, DisambiguateToken(T_RightParen, T_Multiply, T_None));
+  EXPECT_EQ(T_Multiply, DisambiguateToken(T_RightBracket, T_Multiply, T_None));
+  EXPECT_EQ(T_Multiply, DisambiguateToken(T_Number, T_Multiply, T_None));
+}
+
+TEST(DisambiguateToken, OperatorName) {
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_None, T_NameTest, T_None));
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_At, T_NameTest, T_None));
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_DoubleColon, T_NameTest, T_None));
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_LeftParen, T_NameTest, T_None));
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_LeftBracket, T_NameTest, T_None));
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_Comma, T_NameTest, T_None));
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_Multiply, T_NameTest, T_None));
+  EXPECT_EQ(T_NameTest, DisambiguateToken(T_Slash, T_NameTest, T_None));
+  EXPECT_EQ(T_OperatorName, DisambiguateToken(T_RightParen, T_NameTest, T_None));
+  EXPECT_EQ(T_OperatorName, DisambiguateToken(T_RightBracket, T_NameTest, T_None));
+  EXPECT_EQ(T_OperatorName, DisambiguateToken(T_Number, T_NameTest, T_None));
+}
+
+TEST(DisambiguateToken, FunctionName) {
+  EXPECT_EQ(T_FunctionName, DisambiguateToken(T_None, T_NameTest, T_LeftParen));
+}
+
+TEST(DisambiguateToken, AxisName) {
+  EXPECT_EQ(T_AxisName, DisambiguateToken(T_None, T_NameTest, T_DoubleColon));
+}
+
+// TODO: unit tests for Tokenize()
+//        include test that distinguishes between FunctionName and NodeType
+//        include test that errors out on valid token which is not a valid Operator name
 
 }  // namespace xpath
 }  // namespace

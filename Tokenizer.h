@@ -44,19 +44,11 @@ enum TokenType {
   T_VariableReference,
 
   // Identifiers
+  T_NodeType,
   T_OperatorName,
   T_FunctionName,
-  T_NodeType,
   T_AxisName,
   T_NameTest };
-
-enum OperatorNames {
-  O_And,
-  O_Or,
-  O_Mod,
-  O_Div,
-  
-};
 
 enum NodeTypes {
   N_None = 0,
@@ -65,6 +57,14 @@ enum NodeTypes {
   N_Text,
   N_ProcessingInstruction,
   N_Node };
+
+enum OperatorNames {
+  O_None = 0,
+
+  O_And,
+  O_Or,
+  O_Mod,
+  O_Div };
 
 enum AxisTypes {
   A_None = 0,
@@ -110,6 +110,9 @@ TokenType ScanToken(const char* data, size_t size,
 // types of the surrounding tokens `previous` and `next` (either of which may
 // be T_None, if the current token is the first or last token in sequence,
 // respectively).
+//
+// This function does not distinguish between function names and node types.
+// Both are returned as T_FunctionName.
 TokenType DisambiguateToken(TokenType previous,
                             TokenType current,
                             TokenType next);

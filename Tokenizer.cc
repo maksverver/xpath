@@ -123,22 +123,32 @@ TokenType ScanToken(const char* data, size_t size,
   RETURN_ERROR();
 }
 
+bool IsOperator(TokenType type) {
+  return (type >= T_Slash && type <= T_Multiply) || type == T_OperatorName;
+}
+
 TokenType DisambiguateToken(TokenType previous,
                             TokenType current,
                             TokenType next) {
-  // TODO!!
-/*
-If there is a preceding token and the preceding token is not one of @, ::, (, [, , or an Operator,
-then a * must be recognized as a MultiplyOperator and an NCName must be recognized as an OperatorName.
-
-If the character following an NCName (possibly after intervening ExprWhitespace) is (,
-then the token must be recognized as a NodeType or a FunctionName.
-
-If the two characters following an NCName (possibly after intervening ExprWhitespace) are ::,
-then the token must be recognized as an AxisName.
-
-Otherwise, the token must not be recognized as a MultiplyOperator, an OperatorName, a NodeType, a FunctionName, or an AxisName.
-*/
+  // If there is a preceding token and the preceding token is not one of @, ::,
+  // (, [, , or an Operator, then a * must be recognized as a MultiplyOperator
+  // and an NCName must be recognized as an OperatorName.
+  if (previous != T_None && previous != T_At && previous != T_DoubleColon &&
+      previous != T_LeftParen && previous != T_LeftBracket && previous != T_Comma &&
+      !IsOperator(previous)) {
+    if (current == T_Multiply) return T_Multiply;
+    if (current == T_NameTest) return T_OperatorName;
+  }
+  // If the character following an NCName (possibly after intervening
+  // ExprWhitespace) is (, then the token must be recognized as a NodeType or a
+  // FunctionName.
+  if (current == T_NameTest && next == T_LeftParen) return T_FunctionName;
+  // If the two characters following an NCName (possibly after intervening
+  // ExprWhitespace) are ::, then the token must be recognized as an AxisName.
+  if (current == T_NameTest && next == T_DoubleColon) return T_AxisName;
+  // Otherwise, the token must not be recognized as a MultiplyOperator, an
+  // OperatorName, a NodeType, a FunctionName, or an AxisName.
+  if (current == T_Multiply) return T_NameTest;
   return current;
 }
 
