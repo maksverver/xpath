@@ -101,6 +101,7 @@ void TestScanToken(
 }
 
 TEST(TokenizerTest, MultipleTokens) {
+  // TODO: rewrite these tests using gmock matchers 
   TestScanToken("concat('foo', 'bar', 'baz')",
     {{T_NameTest, "concat"},
      {T_LeftParen, "("},
@@ -167,10 +168,6 @@ TEST(DisambiguateToken, AxisName) {
   EXPECT_EQ(T_AxisName, DisambiguateToken(T_None, T_NameTest, T_DoubleColon));
 }
 
-NodeType ParseNodeType(const string& s) {
-  return xpath::ParseNodeType(s.data(), s.size());
-}
-
 TEST(ParseNodeType, ValidNodeTypes) {
   EXPECT_EQ(N_Comment, ParseNodeType("comment"));
   EXPECT_EQ(N_Text, ParseNodeType("text"));
@@ -187,10 +184,6 @@ TEST(ParseNodeType, InvalidNodeTypes) {
   EXPECT_EQ(N_None, ParseNodeType("and"));
 }
 
-OperatorName ParseOperatorName(const string& s) {
-  return xpath::ParseOperatorName(s.data(), s.size());
-}
-
 TEST(ParseOperatorName, ValidOperatorNames) {
   EXPECT_EQ(O_And, ParseOperatorName("and"));
   EXPECT_EQ(O_Or, ParseOperatorName("or"));
@@ -204,10 +197,6 @@ TEST(ParseOperatorName, InvalidOperatorNames) {
   EXPECT_EQ(O_None, ParseOperatorName("an"));
   EXPECT_EQ(O_None, ParseOperatorName("andy"));
   EXPECT_EQ(O_None, ParseOperatorName("node"));
-}
-
-AxisName ParseAxisName(const string& s) {
-  return xpath::ParseAxisName(s.data(), s.size());
 }
 
 TEST(ParseAxisName, ValidAxisNames) {
@@ -234,9 +223,15 @@ TEST(ParseAxisName, InvalidAxisNames) {
   EXPECT_EQ(A_None, ParseAxisName("node"));
 }
 
-// TODO: unit tests for Tokenize()
-//        include test that distinguishes between FunctionName and NodeType
-//        include test that errors out on valid token which is not a valid Operator name
+TEST(Tokenize, TestTokenization) {
+  std::vector<std::pair<TokenType, std::string>> tokens;
+  EXPECT_EQ(12345, Tokenize("/foo/sibling::bar[index()<7]", &tokens));
+  // TODO: actual unit tests for Tokenize()!
+  //        test parse errors
+  //        test that Tokenize clears output `tokens` vector
+  //        include test that distinguishes between FunctionName and NodeType
+  //        include test that errors out on valid token which is not a valid Operator name
+}
 
 }  // namespace
 }  // namespace xpath

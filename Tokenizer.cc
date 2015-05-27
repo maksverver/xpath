@@ -3,6 +3,7 @@
 
 #include "Tokenizer.h"
 
+#include <assert.h>
 #include <ctype.h>
 #include <string.h>
 
@@ -186,6 +187,36 @@ TokenType DisambiguateToken(TokenType previous,
   // OperatorName, a NodeType, a FunctionName, or an AxisName.
   if (current == T_Multiply) return T_NameTest;
   return current;
+}
+
+size_t Tokenize(const std::string& input,
+                std::vector<std::pair<TokenType, std::string>> *tokens_ptr) {
+  auto& tokens = *tokens_ptr;
+  tokens.clear();
+  const char* data = input.data();
+  const char* data_end = data + input.size();
+  const char* token_data = nullptr;
+  size_t token_size = 0;
+  TokenType token_type;
+  while ((token_type = ScanToken(data, data_end - data, &token_data, &token_size)) != T_None) {
+    tokens.push_back({token_type, std::string(token_data, token_size)});
+    data = token_data + token_size;
+  }
+  for (size_t i = 0; i < tokens.size(); ++i) {
+    tokens[i].first = DisambiguateToken(
+        i > 0 ? tokens[i - 1].first : T_None,
+        tokens[i].first,
+        i + 1 < tokens.size() ? tokens[i + 1].first : T_None);
+    // Disambiguate function names and node types.
+    if (tokens[i].first == T_FunctionName && ParseNodeType(tokens[i].second) != N_None) {
+      tokens[i].first = T_NodeType;
+    }
+  }
+  if (token_size != 0) {
+    assert(data != data_end);
+    return data - input.data();
+  }
+  return input.size();
 }
 
 }  // namespace xpath

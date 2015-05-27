@@ -87,14 +87,26 @@ enum AxisName {
 // N_None if it does not match any node type. Matching is case sensitive.
 NodeType ParseNodeType(const char* data, size_t size);
 
+inline NodeType ParseNodeType(const std::string& s) {
+  return ParseNodeType(s.data(), s.size());
+}
+
 // Converts the string described by `data` and `size` to an OperatorName or
 // returns O_None if it does not match any operator name. Matching is case
 // sensitive.
 OperatorName ParseOperatorName(const char* data, size_t size);
 
+inline OperatorName ParseOperatorName(const std::string& s) {
+  return ParseOperatorName(s.data(), s.size());
+}
+
 // Converts the string described by `data` and `size` to an AxisType or returns
 // A_None if it does not match any axis type. Matching is case sensitive.
 AxisName ParseAxisName(const char* data, size_t size);
+
+inline AxisName ParseAxisName(const std::string& s) {
+  return ParseAxisName(s.data(), s.size());
+}
 
 // Scans the next token (skipping whitespace, if any) from the string described
 // by `data` and `size`.
