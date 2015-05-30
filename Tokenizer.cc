@@ -190,6 +190,7 @@ TokenType DisambiguateToken(TokenType previous,
 }
 
 size_t Tokenize(const std::string& input,
+                std::function<bool(const std::string&)> is_node_type,
                 std::vector<std::pair<TokenType, std::string>> *tokens_ptr) {
   auto& tokens = *tokens_ptr;
   tokens.clear();
@@ -208,7 +209,7 @@ size_t Tokenize(const std::string& input,
         tokens[i].first,
         i + 1 < tokens.size() ? tokens[i + 1].first : T_None);
     // Disambiguate function names and node types.
-    if (tokens[i].first == T_FunctionName && ParseNodeType(tokens[i].second) != N_None) {
+    if (tokens[i].first == T_FunctionName && is_node_type(tokens[i].second)) {
       tokens[i].first = T_NodeType;
     }
   }

@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <functional>
 
 namespace xpath {
 
@@ -146,7 +147,18 @@ TokenType DisambiguateToken(TokenType previous,
 // returns input.size(). Otherwise, it returns a value less than input.size():
 // the index where the scanning error occurred.
 size_t Tokenize(const std::string& input,
+                std::function<bool(const std::string&)> is_node_type,
                 std::vector<std::pair<TokenType, std::string>> *tokens);
+
+inline size_t Tokenize(const std::string& input,
+    std::vector<std::pair<TokenType, std::string>> *tokens) {
+  return Tokenize(
+      input,
+      [](const std::string& s) {
+        return ParseOperatorName(s) != O_None;
+      },
+      tokens);
+}
 
 }  // namespace xpath
 
