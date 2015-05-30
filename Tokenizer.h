@@ -155,7 +155,7 @@ inline size_t Tokenize(const std::string& input,
   return Tokenize(
       input,
       [](const std::string& s) {
-        return ParseOperatorName(s) != O_None;
+        return ParseNodeType(s) != N_None;
       },
       tokens);
 }

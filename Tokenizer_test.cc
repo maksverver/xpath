@@ -220,14 +220,84 @@ TEST(ParseAxisName, InvalidAxisNames) {
   EXPECT_EQ(A_None, ParseAxisName("node"));
 }
 
-TEST(Tokenize, TestTokenization) {
-  std::vector<std::pair<TokenType, std::string>> tokens;
-  EXPECT_EQ(12345, Tokenize("/foo/sibling::bar[index()<7]", &tokens));
-  // TODO: actual unit tests for Tokenize()!
-  //        test parse errors
-  //        test that Tokenize clears output `tokens` vector
-  //        include test that distinguishes between FunctionName and NodeType
-  //        include test that errors out on valid token which is not a valid Operator name
+void TestTokenize(const string& input, size_t parsed_prefix_length,
+    const std::vector<std::pair<TokenType, std::string>>& expected) {
+  std::vector<std::pair<TokenType, std::string>> received;
+  EXPECT_EQ(parsed_prefix_length, Tokenize(input, &received));
+  EXPECT_THAT(received, ContainerEq(expected));
+}
+
+void TestTokenize(
+    const string& input,
+    const std::vector<std::pair<TokenType, std::string>>& expected) {
+  return TestTokenize(input, input.size(), expected);
+}
+
+TEST(Tokenize, ValidExpressions) {
+  TestTokenize("", {});
+  TestTokenize("foo", {{T_NameTest, "foo"}});
+  TestTokenize("/foo/sibling::bar[index()<7]",
+     {{T_Slash, "/"},
+      {T_NameTest, "foo"},
+      {T_Slash, "/"},
+      {T_AxisName, "sibling"},
+      {T_DoubleColon, "::"},
+      {T_NameTest, "bar"},
+      {T_LeftBracket, "["},
+      {T_FunctionName, "index"},
+      {T_LeftParen, "("},
+      {T_RightParen, ")"},
+      {T_LessThan, "<"},
+      {T_Number, "7"},
+      {T_RightBracket, "]"}});
+}
+
+TEST(Tokenize, ClearsOutput) {
+  std::vector<std::pair<TokenType, std::string>> expected, received;
+  expected = {{T_NameTest, "foo"}};
+  Tokenize("foo", &received);
+  EXPECT_THAT(received, ContainerEq(expected));
+  expected = {{T_NameTest, "bar"}};
+  Tokenize("bar", &received);
+  EXPECT_THAT(received, ContainerEq(expected));
+  expected.clear();
+  EXPECT_EQ(0, Tokenize("~", &received));
+  EXPECT_THAT(received, ContainerEq(expected));
+}
+
+TEST(Tokenize, InvalidInput) {
+  TestTokenize("~", 0, {});
+  TestTokenize(" ~", 1, {});
+  TestTokenize("foo ~", 4, {{T_NameTest, "foo"}});
+}
+
+TEST(Tokenize, IdentifiesNodeType) {
+  TestTokenize("/foo()",
+      {{T_Slash, "/"},
+       {T_FunctionName, "foo"},
+       {T_LeftParen, "("},
+       {T_RightParen, ")"}});
+   TestTokenize("/text()",
+       {{T_Slash, "/"},
+        {T_NodeType, "text"},
+        {T_LeftParen, "("},
+        {T_RightParen, ")"}});
+}
+
+TEST(Tokenize, InvalidAxisName) {
+  // The tokenizer does not currently enforce the validity of axis names.
+  TestTokenize("foo::bar",
+      {{T_AxisName, "foo"},
+       {T_DoubleColon, "::"},
+       {T_NameTest, "bar"}});
+}
+
+TEST(Tokenize, InvalidOperatorName) {
+  // The tokenizer does not currently enforce the validity of operator names.
+  TestTokenize("1 plus 2",
+      {{T_Number, "1"},
+       {T_OperatorName, "plus"},
+       {T_Number, "2"}});
 }
 
 }  // namespace

@@ -214,8 +214,8 @@ size_t Tokenize(const std::string& input,
     }
   }
   if (token_size != 0) {
-    assert(data != data_end);
-    return data - input.data();
+    assert(token_data >= data && token_data < data_end);
+    return token_data - input.data();
   }
   return input.size();
 }
