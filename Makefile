@@ -2,9 +2,12 @@ CXXFLAGS=-std=c++0x
 
 TESTS=Tokenizer_test
 
-GTEST_DIR=../gtest-1.7.0
-TEST_CFLAGS=-I$(GTEST_DIR)/include
-TEST_LIBS=$(GTEST_DIR)/lib/.libs/libgtest.a $(GTEST_DIR)/lib/.libs/libgtest_main.a
+GMOCK_DIR=../gmock-1.7.0
+TEST_CFLAGS=-I$(GMOCK_DIR)/gtest/include -I$(GMOCK_DIR)/include
+TEST_LIBS= \
+	$(GMOCK_DIR)/gtest/lib/.libs/libgtest.a \
+	$(GMOCK_DIR)/lib/.libs/libgmock.a \
+	$(GMOCK_DIR)/lib/.libs/libgmock_main.a
 
 all:
 

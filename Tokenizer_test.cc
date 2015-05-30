@@ -1,4 +1,5 @@
 #include "Tokenizer.h"
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
@@ -7,6 +8,7 @@
 using std::string;
 using std::vector;
 using std::pair;
+using testing::ContainerEq;
 
 namespace xpath {
 namespace {
@@ -81,27 +83,22 @@ TEST(ScanToken, SingleToken) {
 void TestScanToken(
     const string& input,
     const vector<pair<TokenType, string>>& expected) {
-  int num_tokens = 0;
+  vector<pair<TokenType, string>> received;
   const char* input_data = input.data();
   const char* input_end = input_data + input.size();
-  TokenType type;
+  TokenType token_type;
   const char* token_data;
   size_t token_size;
-  while ((type = ScanToken(
+  while ((token_type = ScanToken(
       input_data, input_end - input_data,
       &token_data, &token_size)) != T_None) {
-    string token(token_data, token_data + token_size);
-    EXPECT_EQ(num_tokens < expected.size() ? expected[num_tokens].first : T_None, type);
-    EXPECT_EQ(num_tokens < expected.size() ? expected[num_tokens].second : string(), token);
-    ++num_tokens;
+    received.push_back({token_type, string(token_data, token_data + token_size)});
     input_data = token_data + token_size;
   }
-  EXPECT_EQ(0, token_size);
-  EXPECT_EQ(expected.size(), num_tokens);
+  EXPECT_THAT(received, ContainerEq(expected));
 }
 
 TEST(TokenizerTest, MultipleTokens) {
-  // TODO: rewrite these tests using gmock matchers 
   TestScanToken("concat('foo', 'bar', 'baz')",
     {{T_NameTest, "concat"},
      {T_LeftParen, "("},
